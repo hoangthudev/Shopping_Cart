@@ -15,7 +15,7 @@
             <div class="col-md-6 offset-md-3">
                 <div class="card card-sh">
                     <div class="card-header text-center ">
-                        <p class="fs-4">Add Product</p>
+                        <p class="fs-4">Edit Product</p>
 
                         <th:block th:if="${session.successMsg}">
                             <p class="text-success fw-bold">[[${session.successMsg}]]</p>
@@ -30,29 +30,45 @@
                     </div>
 
                     <div class="card-body">
-                        <form action="/admin/saveProduct" method="post" enctype="multipart/form-data">
+                        <form action="/admin/updateProduct" method="post" enctype="multipart/form-data">
+
+                            <input type="hidden" name="id" th:value="${product.id}">
+
                             <div class="mb-3">
                                 <label>Enter Title</label>
-                                <input type="text" name="title" class="form-control">
+                                <input type="text" name="title" class="form-control" th:value="${product.title}">
                             </div>
 
                             <div class="mb-3">
                                 <label>Enter Description</label>
-                                <textarea rows="3" cols="" class="form-control" name="description"></textarea>
+                                <textarea rows="3" cols="" class="form-control" name="description"
+                                          >[[${product.description}]]
+                                </textarea>
                             </div>
 
                             <div class="mb-3">
                                 <label>Category</label>
                                 <select class="form-control" name="category">
-                                    <option>--select--</option>
+                                    <option>[[${product.category}]]</option>
                                     <option th:each="c : ${categories}">[[${c.name}]]</option>
                                 </select>
                             </div>
 
                             <div class="mb-3">
                                 <label>Enter Price</label>
-                                <input type="number" name="price" class="form-control">
+                                <input type="number" name="price" class="form-control" th:value="${product.price}">
                             </div>
+
+                            <div class="mb-3">
+                                <label>Discount</label>
+                                <input type="number" name="discount" class="form-control" th:value="${product.discount}">
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Discount Price</label>
+                                <input type="number" name="discountPrice" class="form-control" readonly th:value="${product.discountPrice}">
+                            </div>
+
                             <div class="mb-3">
                                 <label>Status</label>
                                 <div class="form-check">
@@ -72,12 +88,17 @@
                             <div class="row">
 
                                 <div class="mb-3 col">
-                                    <label>Enter Stock</label> <input type="text" name="stock" class="form-control">
+                                    <label>Enter Stock</label>
+                                    <input type="text" name="stock" class="form-control" th:value="${product.stock}">
                                 </div>
 
                                 <div class="mb-3 col">
                                     <label>Upload Image</label> <input type="file" name="file" class="form-control">
                                 </div>
+                            </div>
+                            <div class="mb-3 col">
+                                <img th:src="@{'/img/product_img/'+${product.image}}"
+                                     width="100px" height="70px">
                             </div>
                             <button class="btn btn-primary col-md-12">Submit</button>
                         </form>
