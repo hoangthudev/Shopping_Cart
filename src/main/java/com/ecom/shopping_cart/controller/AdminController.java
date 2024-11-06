@@ -2,8 +2,10 @@ package com.ecom.shopping_cart.controller;
 
 import com.ecom.shopping_cart.module.Category;
 import com.ecom.shopping_cart.module.Product;
+import com.ecom.shopping_cart.module.UserDtls;
 import com.ecom.shopping_cart.service.CategoryService;
 import com.ecom.shopping_cart.service.ProductService;
+import com.ecom.shopping_cart.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -19,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -31,9 +34,23 @@ public class AdminController {
     @Autowired
     private ProductService productService;
 
-    @GetMapping("/")
+    @Autowired
+    private UserService userService;
+
+    @GetMapping({"/", ""})
     public String index() {
         return "admin/index";
+    }
+
+    @ModelAttribute
+    public void getUserDetail(Principal principal, Model model) {
+        if (principal != null) {
+            String email = principal.getName();
+            UserDtls userDtls = this.userService.getUserByEmail(email);
+            model.addAttribute("user", userDtls);
+        }
+        List<Category> allActiveCategory = this.categoryService.getAllActiveCategories();
+        model.addAttribute("categorys", allActiveCategory);
     }
 
     // Products

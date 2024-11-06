@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -48,6 +49,17 @@ public class HomeController {
     @GetMapping("/register")
     public String register() {
         return "register";
+    }
+
+    @ModelAttribute
+    public void getUserDetail(Principal principal, Model model) {
+        if (principal != null) {
+            String email = principal.getName();
+            UserDtls userDtls = this.userService.getUserByEmail(email);
+            model.addAttribute("user", userDtls);
+        }
+        List<Category> allActiveCategory = this.categoryService.getAllActiveCategories();
+        model.addAttribute("categorys", allActiveCategory);
     }
 
     @PostMapping("/save-user")
