@@ -16,23 +16,33 @@
             </div>
             <div class="col-md-6 mt-5-p-5">
                 <div class="card shadow p-3 mb-5 bg-body-tertiary rounded">
-                    <div class="card-header">
+                    <div class="card-header text-center">
                         <p class="fs-4 text-center">REGISTER</p>
+
+                        <th:block th:if="${session.successMsg}">
+                            <p class="text-success fw-bold">[[${session.successMsg}]]</p>
+                            <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                        </th:block>
+
+                        <th:block th:if="${session.errorMsg}">
+                            <p class="text-danger fw-bold">[[${session.errorMsg}]]</p>
+                            <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                        </th:block>
                     </div>
                     <div class="card-body">
-                        <form>
+                        <form th:action="@{/save-user}" enctype="multipart/form-data" method="post">
                             <div class="row">
                                 <div class="col">
                                     <div class="mb-3">
                                         <label class="form-label">Full Name</label>
-                                        <input type="text" class="form-control" name="name"/>
+                                        <input type="text" class="form-control" name="name" required/>
                                     </div>
                                 </div>
 
                                 <div class="col">
                                     <div class="mb-3">
                                         <label class="form-label">Mobile Number</label>
-                                        <input type="number" class="form-control" name="mobileNumber"/>
+                                        <input type="number" class="form-control" name="mobileNumber" required/>
                                     </div>
                                 </div>
                             </div>
@@ -41,7 +51,7 @@
                                 <div class="col">
                                     <div class="mb-3">
                                         <label class="form-label">Email</label>
-                                        <input type="email" class="form-control" name="email"/>
+                                        <input type="email" class="form-control" name="email" required/>
                                     </div>
                                 </div>
 
@@ -50,14 +60,14 @@
                                 <div class="col">
                                     <div class="mb-3">
                                         <label class="form-label">Address</label>
-                                        <input type="text" class="form-control" name="address"/>
+                                        <input type="text" class="form-control" name="address" required/>
                                     </div>
                                 </div>
 
                                 <div class="col">
                                     <div class="mb-3">
                                         <label class="form-label">City</label>
-                                        <input type="text" class="form-control" name="city"/>
+                                        <input type="text" class="form-control" name="city" required/>
                                     </div>
                                 </div>
                             </div>
@@ -66,14 +76,14 @@
                                 <div class="col">
                                     <div class="mb-3">
                                         <label class="form-label">State</label>
-                                        <input type="text" class="form-control" name="state"/>
+                                        <input type="text" class="form-control" name="state" required/>
                                     </div>
                                 </div>
 
                                 <div class="col">
                                     <div class="mb-3">
                                         <label class="form-label">Pincode</label>
-                                        <input type="number" class="form-control" name="pincode"/>
+                                        <input type="number" class="form-control" name="pinCode" required/>
                                     </div>
                                 </div>
                             </div>
@@ -82,14 +92,14 @@
                                 <div class="col">
                                     <div class="mb-3">
                                         <label class="form-label">Password</label>
-                                        <input type="password" class="form-control" name="password"/>
+                                        <input type="password" class="form-control" name="password" required/>
                                     </div>
                                 </div>
 
                                 <div class="col">
                                     <div class="mb-3">
                                         <label class="form-label">Confirm Password</label>
-                                        <input type="password" class="form-control" name="cpassword"/>
+                                        <input type="password" class="form-control" name="cpassword" required/>
                                     </div>
 
                                 </div>
@@ -97,10 +107,10 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Profile Image</label>
-                                <input type="file" class="form-control" name="profile_image"/>
+                                <input type="file" class="form-control" name="img"/>
                             </div>
 
-                            <button type="submit" class="btn bg-primary text-white col-md-12">Login</button>
+                            <button type="submit" class="btn bg-primary text-white col-md-12">Register</button>
                         </form>
                     </div>
 
