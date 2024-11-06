@@ -56,10 +56,12 @@ public class ProductServiceImpl implements ProductService {
         String imageName = image.isEmpty() ? dbProduct.getImage() : image.getOriginalFilename();
 
         dbProduct.setTitle(product.getTitle());
+        dbProduct.setCategory(product.getCategory());
         dbProduct.setDescription(product.getDescription());
         dbProduct.setPrice(product.getPrice());
         dbProduct.setStock(product.getStock());
         dbProduct.setImage(imageName);
+        dbProduct.setIsActive(product.getIsActive());
 
         dbProduct.setDiscount(product.getDiscount());
 
@@ -90,5 +92,18 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return null;
+    }
+
+    @Override
+    public List<Product> getAllActiveProducts(String category) {
+        List<Product> products = null;
+        if (ObjectUtils.isEmpty(category)) {
+            products = this.productRepository.findByIsActiveTrue();
+        } else {
+            products = this.productRepository.findByCategory(category);
+        }
+
+
+        return products;
     }
 }
