@@ -239,4 +239,26 @@ public class AdminController {
         }
         return "redirect:/admin/loadEditCategory/" + category.getId();
     }
+
+    // User
+
+    @GetMapping("/users")
+    public String getAllUser(Model model){
+        List<UserDtls> users = this.userService.getAllUsers("ROLE_USER");
+        model.addAttribute("users", users);
+        return "admin/users";
+    }
+
+    @GetMapping("/update-status")
+    public String updateUserAccountStatus(@RequestParam Boolean status,
+                                          @RequestParam Integer id,
+                                          HttpSession session){
+        Boolean resultUpdateAccount = this.userService.updateAccountStatus(id, status);
+        if (resultUpdateAccount){
+            session.setAttribute("successMsg", "Account status successfully");
+        } else {
+            session.setAttribute("errorMsg", "Something wrong on server");
+        }
+        return "redirect:/admin/users";
+    }
 }
