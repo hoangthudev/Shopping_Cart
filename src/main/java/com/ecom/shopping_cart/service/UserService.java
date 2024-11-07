@@ -24,4 +24,10 @@ public interface UserService {
     public Boolean unlockAccountTimeExpired(UserDtls user);
 
     public void resetAttempt(int userId);
+
+    void updateUserResetToken(String email, String resetToken);
+
+    public UserDtls getUserByToken(String token);
+
+    public UserDtls updateUser(UserDtls user);
 }
