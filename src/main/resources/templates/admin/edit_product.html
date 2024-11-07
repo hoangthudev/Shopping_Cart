@@ -42,7 +42,7 @@
                             <div class="mb-3">
                                 <label>Enter Description</label>
                                 <textarea rows="3" cols="" class="form-control" name="description"
-                                          >[[${product.description}]]
+                                >[[${product.description}]]
                                 </textarea>
                             </div>
 
@@ -61,27 +61,30 @@
 
                             <div class="mb-3">
                                 <label>Discount</label>
-                                <input type="number" name="discount" class="form-control" th:value="${product.discount}">
+                                <input type="number" name="discount" class="form-control"
+                                       th:value="${product.discount}">
                             </div>
 
                             <div class="mb-3">
                                 <label>Discount Price</label>
-                                <input type="number" name="discountPrice" class="form-control" readonly th:value="${product.discountPrice}">
+                                <input type="number" name="discountPrice" class="form-control" readonly
+                                       th:value="${product.discountPrice}">
                             </div>
 
                             <div class="mb-3">
                                 <label>Status</label>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" checked value="true" name="isActive"
-                                           id="flexRadioDefault1">
-                                    <label class="form-check-label" for="flexRadioDefault1">Active </label>
+                                    <input class="form-check-input" type="radio" th:checked="${product.isActive==true}"
+                                           value="true" name="isActive" id="flexRadioDefault1">
+                                    <label class="form-check-label" for="flexRadioDefault1">
+                                        Active </label>
                                 </div>
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="isActive"
-                                           value="false" id="flexRadioDefault2">
-                                    <label class="form-check-label" for="flexRadioDefault2">
-                                        Inactive
-                                    </label>
+                                           th:checked="${product.isActive==false}"
+                                           value="false" id="flexRadioDefault2"> <label
+                                        class="form-check-label" for="flexRadioDefault2">
+                                    Inactive </label>
                                 </div>
 
                             </div>
