@@ -13,7 +13,7 @@
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
           integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
-          crossorigin="anonymous" referrerpolicy="no-referrer" />
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
 
     <link rel="stylesheet" href="/css/style.css">
 </head>
@@ -48,7 +48,6 @@
                 </th:block>
 
 
-
                 <li class="nav-item"><a class="nav-link active"
                                         aria-current="page" href="/products">Product</a></li>
 
@@ -57,9 +56,11 @@
                         data-bs-toggle="dropdown" aria-expanded="false"> Category </a>
                     <ul class="dropdown-menu">
                         <li th:each="c:${categorys}"><a class="dropdown-item"
-                                                        th:href="@{'/products?category='+${c.name}}">[[${c.name}]]</a></li>
+                                                        th:href="@{'/products?category='+${c.name}}">[[${c.name}]]</a>
+                        </li>
 
-                    </ul></li>
+                    </ul>
+                </li>
 
             </ul>
 
@@ -81,6 +82,13 @@
                                 class="fa-solid fa-cart-shopping"></i> Cart [ [[${countCart}]]
                             ]</a></li>
                     </th:block>
+                    <th:block th:if="${user.role=='ROLE_ADMIN'}">
+                        <li class="nav-item"><a class="nav-link active"
+                                                aria-current="page" href="/admin/">
+                            Admin Dashboard
+                        </a></li>
+                    </th:block>
+
                     <li class="nav-item dropdown"><a
                             class="nav-link dropdown-toggle active" href="#" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false"> <i
@@ -96,9 +104,12 @@
                             <li th:if="${user.role=='ROLE_USER'}"><a
                                     class="dropdown-item" href="/user/user-orders">My Orders</a></li>
                             <li><a class="dropdown-item" href="/logout">Logout</a></li>
-                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
 
-                        </ul></li>
+                        </ul>
+                    </li>
 
                     <!-- <li class="nav-item"><a class="nav-link active"
                         aria-current="page" href="/logout"><i

@@ -3,6 +3,7 @@ package com.ecom.shopping_cart.controller;
 import com.ecom.shopping_cart.module.Category;
 import com.ecom.shopping_cart.module.Product;
 import com.ecom.shopping_cart.module.UserDtls;
+import com.ecom.shopping_cart.service.CartService;
 import com.ecom.shopping_cart.service.CategoryService;
 import com.ecom.shopping_cart.service.ProductService;
 import com.ecom.shopping_cart.service.UserService;
@@ -35,6 +36,9 @@ public class AdminController {
     private ProductService productService;
 
     @Autowired
+    private CartService cartService;
+
+    @Autowired
     private UserService userService;
 
     @GetMapping({"/", ""})
@@ -48,6 +52,8 @@ public class AdminController {
             String email = principal.getName();
             UserDtls userDtls = this.userService.getUserByEmail(email);
             model.addAttribute("user", userDtls);
+            Integer countCart = this.cartService.getCountCart(userDtls.getId());
+            model.addAttribute("countCart", countCart);
         }
         List<Category> allActiveCategory = this.categoryService.getAllActiveCategories();
         model.addAttribute("categorys", allActiveCategory);
@@ -243,7 +249,7 @@ public class AdminController {
     // User
 
     @GetMapping("/users")
-    public String getAllUser(Model model){
+    public String getAllUser(Model model) {
         List<UserDtls> users = this.userService.getAllUsers("ROLE_USER");
         model.addAttribute("users", users);
         return "admin/users";
@@ -252,9 +258,9 @@ public class AdminController {
     @GetMapping("/update-status")
     public String updateUserAccountStatus(@RequestParam Boolean status,
                                           @RequestParam Integer id,
-                                          HttpSession session){
+                                          HttpSession session) {
         Boolean resultUpdateAccount = this.userService.updateAccountStatus(id, status);
-        if (resultUpdateAccount){
+        if (resultUpdateAccount) {
             session.setAttribute("successMsg", "Account status successfully");
         } else {
             session.setAttribute("errorMsg", "Something wrong on server");

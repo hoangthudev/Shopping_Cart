@@ -11,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
@@ -43,6 +40,8 @@ public class UserController {
             String email = principal.getName();
             UserDtls userDtls = this.userService.getUserByEmail(email);
             model.addAttribute("user", userDtls);
+            Integer countCart = this.cartService.getCountCart(userDtls.getId());
+            model.addAttribute("countCart", countCart);
         }
         List<Category> allActiveCategory = this.categoryService.getAllActiveCategories();
         model.addAttribute("categorys", allActiveCategory);
@@ -60,4 +59,33 @@ public class UserController {
         }
         return "redirect:/product/" + productId;
     }
+
+    private UserDtls getLoggedInUserDetails(Principal principal) {
+        String email = principal.getName();
+        UserDtls userDtls = this.userService.getUserByEmail(email);
+        return userDtls;
+    }
+
+    @GetMapping("/cart")
+    public String loadCartPage(Principal principal, Model model) {
+
+        UserDtls userDtls = this.getLoggedInUserDetails(principal);
+
+        List<Cart> carts = this.cartService.getCartByUser(userDtls.getId());
+        model.addAttribute("carts", carts);
+        if (carts.size() > 0) {
+            Double totalOrderPrice = carts.get(carts.size() - 1).getTotalOrderPrice();
+            model.addAttribute("totalOrderPrice", totalOrderPrice);
+        }
+        return "user/cart";
+    }
+
+    @GetMapping("/cart-quantity-update")
+    public String updateCartQuantity(@RequestParam String sy,
+                                     @RequestParam Integer cartId) {
+        this.cartService.updateQuantity(sy, cartId);
+        return "redirect:/user/cart";
+    }
+
+
 }
