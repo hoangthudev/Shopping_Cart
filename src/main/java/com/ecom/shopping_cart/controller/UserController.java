@@ -87,5 +87,9 @@ public class UserController {
         return "redirect:/user/cart";
     }
 
+    @GetMapping("/orders")
+    public String orders(Model model) {
+        return "user/orders";
+    }
 
 }
