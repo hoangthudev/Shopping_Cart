@@ -92,8 +92,20 @@ public class UserController {
         return "redirect:/user/cart";
     }
 
+
     @GetMapping("/orders")
-    public String orders(Model model) {
+    public String orderPage(Principal principal, Model model) {
+
+        UserDtls userDtls = this.getLoggedInUserDetails(principal);
+
+        List<Cart> carts = this.cartService.getCartByUser(userDtls.getId());
+        model.addAttribute("carts", carts);
+        if (carts.size() > 0) {
+            Double orderPrice = carts.get(carts.size() - 1).getTotalOrderPrice();
+            Double totalOrderPrice = carts.get(carts.size() - 1).getTotalOrderPrice() + 250 + 100;
+            model.addAttribute("totalOrderPrice", totalOrderPrice);
+            model.addAttribute("orderPrice", orderPrice);
+        }
         return "user/order";
     }
 
