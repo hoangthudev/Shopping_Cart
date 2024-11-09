@@ -4,6 +4,7 @@ package com.ecom.shopping_cart.module;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -20,7 +21,7 @@ public class ProductOrder {
 
     private String orderId;
 
-    private Date orderDate;
+    private LocalDate orderDate;
 
     @ManyToOne
     private Product product;

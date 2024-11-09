@@ -1,13 +1,11 @@
 package com.ecom.shopping_cart.controller;
 
-import com.ecom.shopping_cart.module.Cart;
-import com.ecom.shopping_cart.module.Category;
-import com.ecom.shopping_cart.module.OrderRequest;
-import com.ecom.shopping_cart.module.UserDtls;
+import com.ecom.shopping_cart.module.*;
 import com.ecom.shopping_cart.service.CartService;
 import com.ecom.shopping_cart.service.CategoryService;
 import com.ecom.shopping_cart.service.OrderService;
 import com.ecom.shopping_cart.service.UserService;
+import com.ecom.shopping_cart.util.OrderStatus;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -117,6 +115,36 @@ public class UserController {
         this.orderService.saveOrder(user.getId(), orderRequest);
 
         return "user/success";
+    }
+
+    @GetMapping("/my-orders")
+    public String myOrder(Model model, Principal principal) {
+        UserDtls user = this.getLoggedInUserDetails(principal);
+        List<ProductOrder> orders = this.orderService.getOrdersByUser(user.getId());
+        model.addAttribute("orders", orders);
+        return "user/my_orders";
+    }
+
+    @GetMapping("/update-status")
+    public String updateOrderStatus(@RequestParam Integer id, @RequestParam Integer st, HttpSession session) {
+
+        OrderStatus[] values = OrderStatus.values();
+
+        String status = null;
+
+        for (OrderStatus orderStatus : values) {
+            if (orderStatus.getId().equals(st)) {
+                status = orderStatus.getName();
+            }
+        }
+
+        Boolean updateOrder = this.orderService.updateOrderStatus(id, status);
+        if (updateOrder) {
+            session.setAttribute("successMsg", "Order status updated");
+        } else {
+            session.setAttribute("successMsg", "Status not updated");
+        }
+        return "redirect:/user/my-orders";
     }
 
 }
