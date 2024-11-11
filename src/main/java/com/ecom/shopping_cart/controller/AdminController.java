@@ -5,7 +5,9 @@ import com.ecom.shopping_cart.module.Product;
 import com.ecom.shopping_cart.module.ProductOrder;
 import com.ecom.shopping_cart.module.UserDtls;
 import com.ecom.shopping_cart.service.*;
+import com.ecom.shopping_cart.util.CommonUtil;
 import com.ecom.shopping_cart.util.OrderStatus;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -17,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -42,6 +45,9 @@ public class AdminController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private CommonUtil commonUtil;
 
     @GetMapping({"/", ""})
     public String index() {
@@ -291,8 +297,14 @@ public class AdminController {
             }
         }
 
-        Boolean updateOrder = this.orderService.updateOrderStatus(id, status);
-        if (updateOrder) {
+        ProductOrder updateOrder = this.orderService.updateOrderStatus(id, status);
+        try {
+            this.commonUtil.sendEmailForProductOrder(updateOrder, status);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (!ObjectUtils.isEmpty(updateOrder)) {
             session.setAttribute("successMsg", "Order status updated");
         } else {
             session.setAttribute("successMsg", "Status not updated");

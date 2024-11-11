@@ -7,10 +7,13 @@ import com.ecom.shopping_cart.module.ProductOrder;
 import com.ecom.shopping_cart.repository.CartRepository;
 import com.ecom.shopping_cart.repository.OrderRepository;
 import com.ecom.shopping_cart.service.OrderService;
+import com.ecom.shopping_cart.util.CommonUtil;
 import com.ecom.shopping_cart.util.OrderStatus;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -24,9 +27,11 @@ public class OrderServiceImpl implements OrderService {
     private OrderRepository orderRepository;
     @Autowired
     private CartRepository cartRepository;
+    @Autowired
+    private CommonUtil commonUtil;
 
     @Override
-    public void saveOrder(Integer userId, OrderRequest orderRequest) {
+    public void saveOrder(Integer userId, OrderRequest orderRequest) throws MessagingException, UnsupportedEncodingException {
 
         List<Cart> carts = this.cartRepository.getCartByUserId(userId);
 
@@ -54,7 +59,8 @@ public class OrderServiceImpl implements OrderService {
 
             order.setOrderAddress(address);
 
-            this.orderRepository.save(order);
+            ProductOrder saveOrder = this.orderRepository.save(order);
+            this.commonUtil.sendEmailForProductOrder(saveOrder, "Success");
         }
     }
 
@@ -65,15 +71,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Boolean updateOrderStatus(Integer id, String status) {
+    public ProductOrder updateOrderStatus(Integer id, String status) {
         Optional<ProductOrder> findById = this.orderRepository.findById(id);
         if (findById.isPresent()) {
             ProductOrder productOrder = findById.get();
             productOrder.setStatus(status);
-            this.orderRepository.save(productOrder);
-            return true;
+            ProductOrder updateOrder = this.orderRepository.save(productOrder);
+            return updateOrder;
         }
-        return false;
+        return null;
     }
 
     @Override

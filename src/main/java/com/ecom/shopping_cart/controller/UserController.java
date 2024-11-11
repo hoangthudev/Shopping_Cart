@@ -5,7 +5,9 @@ import com.ecom.shopping_cart.service.CartService;
 import com.ecom.shopping_cart.service.CategoryService;
 import com.ecom.shopping_cart.service.OrderService;
 import com.ecom.shopping_cart.service.UserService;
+import com.ecom.shopping_cart.util.CommonUtil;
 import com.ecom.shopping_cart.util.OrderStatus;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.List;
 
@@ -31,6 +34,9 @@ public class UserController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private CommonUtil commonUtil;
 
     @GetMapping
     public String home() {
@@ -109,7 +115,7 @@ public class UserController {
 
     @PostMapping("/save-order")
     public String saveOrder(@ModelAttribute OrderRequest orderRequest,
-                            Principal principal) {
+                            Principal principal) throws MessagingException, UnsupportedEncodingException {
 //        System.out.println(orderRequest.toString());
         UserDtls user = this.getLoggedInUserDetails(principal);
         this.orderService.saveOrder(user.getId(), orderRequest);
@@ -138,8 +144,14 @@ public class UserController {
             }
         }
 
-        Boolean updateOrder = this.orderService.updateOrderStatus(id, status);
-        if (updateOrder) {
+        ProductOrder updateOrder = this.orderService.updateOrderStatus(id, status);
+        try {
+            this.commonUtil.sendEmailForProductOrder(updateOrder, status);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (!ObjectUtils.isEmpty(updateOrder)) {
             session.setAttribute("successMsg", "Order status updated");
         } else {
             session.setAttribute("successMsg", "Status not updated");
