@@ -75,4 +75,10 @@ public class OrderServiceImpl implements OrderService {
         }
         return false;
     }
+
+    @Override
+    public List<ProductOrder> getAllOrder() {
+        List<ProductOrder> orders = this.orderRepository.findAll();
+        return orders;
+    }
 }

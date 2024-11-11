@@ -2,11 +2,10 @@ package com.ecom.shopping_cart.controller;
 
 import com.ecom.shopping_cart.module.Category;
 import com.ecom.shopping_cart.module.Product;
+import com.ecom.shopping_cart.module.ProductOrder;
 import com.ecom.shopping_cart.module.UserDtls;
-import com.ecom.shopping_cart.service.CartService;
-import com.ecom.shopping_cart.service.CategoryService;
-import com.ecom.shopping_cart.service.ProductService;
-import com.ecom.shopping_cart.service.UserService;
+import com.ecom.shopping_cart.service.*;
+import com.ecom.shopping_cart.util.OrderStatus;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -40,6 +39,9 @@ public class AdminController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private OrderService orderService;
 
     @GetMapping({"/", ""})
     public String index() {
@@ -266,5 +268,35 @@ public class AdminController {
             session.setAttribute("errorMsg", "Something wrong on server");
         }
         return "redirect:/admin/users";
+    }
+
+    // Orders
+    @GetMapping("orders")
+    public String getAllOrders(Model model) {
+        List<ProductOrder> allOrder = this.orderService.getAllOrder();
+        model.addAttribute("orders", allOrder);
+        return "admin/orders";
+    }
+
+    @PostMapping("/update-order-status")
+    public String updateOrderStatus(@RequestParam Integer id, @RequestParam Integer st, HttpSession session) {
+
+        OrderStatus[] values = OrderStatus.values();
+
+        String status = null;
+
+        for (OrderStatus orderStatus : values) {
+            if (orderStatus.getId().equals(st)) {
+                status = orderStatus.getName();
+            }
+        }
+
+        Boolean updateOrder = this.orderService.updateOrderStatus(id, status);
+        if (updateOrder) {
+            session.setAttribute("successMsg", "Order status updated");
+        } else {
+            session.setAttribute("successMsg", "Status not updated");
+        }
+        return "redirect:/admin/orders";
     }
 }
