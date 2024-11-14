@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 @Configuration
 public class SecurityConfig {
@@ -51,7 +52,15 @@ public class SecurityConfig {
 //						.defaultSuccessUrl("/")
                         .failureHandler(authenticationFailureHandler)
                         .successHandler(authenticationSuccessHandler))
-                .logout(logout -> logout.permitAll());
+                .logout(logout -> logout.permitAll())
+
+                .securityContext(context -> context
+                        .securityContextRepository(new HttpSessionSecurityContextRepository())
+                )
+                .sessionManagement(session -> session
+                        .invalidSessionUrl("/login?session=invalid")
+                );
+        ;
 
         return http.build();
     }

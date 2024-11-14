@@ -194,7 +194,17 @@ public class HomeController {
             model.addAttribute("msg", "Password change successfully");
             return "message";
         }
-
-
     }
+
+    @GetMapping("/search")
+    public String search(@RequestParam String ch,
+                         Model model) {
+        List<Product> searchProducts = this.productService.searchProduct(ch);
+        model.addAttribute("products", searchProducts);
+
+        List<Category> categories = this.categoryService.getAllActiveCategories();
+        model.addAttribute("categories", categories);
+        return "product";
+    }
+
 }
