@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
@@ -157,6 +158,25 @@ public class UserController {
             session.setAttribute("successMsg", "Status not updated");
         }
         return "redirect:/user/my-orders";
+    }
+
+    //profile
+    @GetMapping("/profile")
+    public String profile(Principal principal, Model model) {
+        UserDtls user = this.userService.getUserByEmail(principal.getName());
+        model.addAttribute("user", user);
+        return "user/profile";
+    }
+
+    @PostMapping("/update-profile")
+    public String updateProfile(@ModelAttribute UserDtls user, @RequestParam MultipartFile image, HttpSession session) {
+        UserDtls userProfileUpdate = this.userService.updateUserProfile(user, image);
+        if (ObjectUtils.isEmpty(userProfileUpdate)) {
+            session.setAttribute("error", "Profile update failed");
+        } else {
+            session.setAttribute("successMsg", "Profile updated");
+        }
+        return "redirect:/user/profile";
     }
 
 }
