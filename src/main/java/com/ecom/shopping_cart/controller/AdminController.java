@@ -70,8 +70,15 @@ public class AdminController {
     // Products
 
     @GetMapping("/products")
-    public String viewProduct(Model model) {
-        List<Product> listProduct = this.productService.getAllProducts();
+    public String viewProduct(Model model,
+                              @RequestParam(defaultValue = "") String ch) {
+        List<Product> listProduct = null;
+        if (ch != null && ch.trim().length() > 0) {
+            listProduct = this.productService.searchProduct(ch);
+        } else {
+            listProduct = this.productService.getAllProducts();
+        }
+
         model.addAttribute("products", listProduct);
         return "admin/products";
     }
@@ -334,4 +341,5 @@ public class AdminController {
         }
         return "/admin/orders";
     }
+
 }
