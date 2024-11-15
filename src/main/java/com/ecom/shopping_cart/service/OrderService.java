@@ -3,6 +3,7 @@ package com.ecom.shopping_cart.service;
 import com.ecom.shopping_cart.module.OrderRequest;
 import com.ecom.shopping_cart.module.ProductOrder;
 import jakarta.mail.MessagingException;
+import org.springframework.data.domain.Page;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -18,4 +19,6 @@ public interface OrderService {
     public List<ProductOrder> getAllOrder();
 
     public ProductOrder getOrderById(String orderId);
+
+    public Page<ProductOrder> getAllOrdersPagination(Integer pageNo, Integer pageSize);
 }
