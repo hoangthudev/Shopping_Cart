@@ -1,6 +1,8 @@
 package com.ecom.shopping_cart.util;
 
 import com.ecom.shopping_cart.module.ProductOrder;
+import com.ecom.shopping_cart.module.UserDtls;
+import com.ecom.shopping_cart.service.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 
 import java.io.UnsupportedEncodingException;
+import java.security.Principal;
 
 
 @Component
@@ -18,6 +21,9 @@ public class CommonUtil {
 
     @Autowired
     private JavaMailSender mailSender;
+
+    @Autowired
+    private UserService userService;
 
     String msg = null;
 
@@ -79,5 +85,11 @@ public class CommonUtil {
         mailSender.send(message);
 
         return true;
+    }
+
+    public UserDtls getLoggedInUserDetails(Principal principal) {
+        String email = principal.getName();
+        UserDtls userDtls = this.userService.getUserByEmail(email);
+        return userDtls;
     }
 }

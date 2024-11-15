@@ -13,6 +13,7 @@ import org.hibernate.query.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
@@ -50,6 +51,9 @@ public class AdminController {
 
     @Autowired
     private CommonUtil commonUtil;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping({"/", ""})
     public String index() {
@@ -295,8 +299,15 @@ public class AdminController {
     // User
 
     @GetMapping("/users")
-    public String getAllUser(Model model) {
-        List<UserDtls> users = this.userService.getAllUsers("ROLE_USER");
+    public String getAllUser(Model model,
+                             @RequestParam Integer type) {
+        List<UserDtls> users = null;
+        if (type == 1) {
+            users = this.userService.getAllUsers("ROLE_USER");
+        } else {
+            users = this.userService.getAllUsers("ROLE_ADMIN");
+        }
+        model.addAttribute("userType", type);
         model.addAttribute("users", users);
         return "admin/users";
     }
@@ -304,6 +315,7 @@ public class AdminController {
     @GetMapping("/update-status")
     public String updateUserAccountStatus(@RequestParam Boolean status,
                                           @RequestParam Integer id,
+                                          @RequestParam Integer type,
                                           HttpSession session) {
         Boolean resultUpdateAccount = this.userService.updateAccountStatus(id, status);
         if (resultUpdateAccount) {
@@ -311,7 +323,7 @@ public class AdminController {
         } else {
             session.setAttribute("errorMsg", "Something wrong on server");
         }
-        return "redirect:/admin/users";
+        return "redirect:/admin/users?type=" + type;
     }
 
     // Orders
@@ -402,6 +414,81 @@ public class AdminController {
             model.addAttribute("isLast", page.isLast());
         }
         return "/admin/orders";
+    }
+
+    // admin
+    @GetMapping("/add-admin")
+    public String adminAdd() {
+        return "admin/add_admin";
+    }
+
+    @PostMapping("/save-admin")
+    public String saveAdmin(@ModelAttribute UserDtls user, @RequestParam("img") MultipartFile file,
+                            HttpSession session) throws IOException {
+
+        String imageName = file.isEmpty() ? "default.jpg" : file.getOriginalFilename();
+        user.setProfileImage(imageName);
+        UserDtls saveAdmin = this.userService.saveAdmin(user);
+
+        if (!ObjectUtils.isEmpty(saveAdmin)) {
+            if (!file.isEmpty()) {
+                File saveFile = new ClassPathResource("static/img").getFile();
+
+                Path path = Paths.get(saveFile.getAbsolutePath()
+                        + File.separator + "profile_img"
+                        + File.separator + file.getOriginalFilename());
+
+//            System.out.println(path);
+                Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+
+                session.setAttribute("successMsg", "Register successfully");
+            } else {
+                session.setAttribute("errorMsg", "Register failed");
+            }
+        }
+        return "redirect:/admin/add-admin";
+    }
+
+    @GetMapping("profile")
+    public String profile() {
+        return "admin/profile";
+    }
+
+    @PostMapping("/update-profile")
+    public String updateProfile(@ModelAttribute UserDtls user, @RequestParam MultipartFile image, HttpSession session) {
+        UserDtls userProfileUpdate = this.userService.updateUserProfile(user, image);
+        if (ObjectUtils.isEmpty(userProfileUpdate)) {
+            session.setAttribute("errorMsg", "Profile update failed");
+        } else {
+            session.setAttribute("successMsg", "Profile updated");
+        }
+        return "redirect:/admin/profile";
+    }
+
+    @PostMapping("/change-password")
+    public String changePassword(@RequestParam String newPassword,
+                                 @RequestParam String currentPassword,
+                                 Principal principal,
+                                 HttpSession session) {
+        UserDtls loggInUserDetail = this.commonUtil.getLoggedInUserDetails(principal);
+
+        Boolean matches = this.passwordEncoder.matches(currentPassword, loggInUserDetail.getPassword());
+
+        if (matches) {
+            String encodePassword = this.passwordEncoder.encode(newPassword);
+            loggInUserDetail.setPassword(encodePassword);
+            UserDtls updateUser = this.userService.updateUser(loggInUserDetail);
+
+            if (ObjectUtils.isEmpty(updateUser)) {
+                session.setAttribute("errorMsg", "Password update failed || Error server!");
+            } else {
+                session.setAttribute("successMsg", "Password updated successfully!");
+            }
+        } else {
+            session.setAttribute("errorMsg", "Password does not match");
+        }
+
+        return "redirect:/admin/profile";
     }
 
 }

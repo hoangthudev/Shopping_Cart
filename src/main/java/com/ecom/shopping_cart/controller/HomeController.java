@@ -8,6 +8,7 @@ import com.ecom.shopping_cart.service.CategoryService;
 import com.ecom.shopping_cart.service.ProductService;
 import com.ecom.shopping_cart.service.UserService;
 import com.ecom.shopping_cart.util.CommonUtil;
+import io.micrometer.common.util.StringUtils;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -113,7 +114,8 @@ public class HomeController {
     public String products(Model model,
                            @RequestParam(value = "category", defaultValue = "") String category,
                            @RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
-                           @RequestParam(name = "pageSize", defaultValue = "8") Integer pageSize) {
+                           @RequestParam(name = "pageSize", defaultValue = "8") Integer pageSize,
+                           @RequestParam(name = "ch", defaultValue = "") String ch) {
 
         List<Category> categories = this.categoryService.getAllActiveCategories();
         model.addAttribute("paramValue", category);
@@ -122,7 +124,14 @@ public class HomeController {
 //        List<Product> products = this.productService.getAllActiveProducts(category);
 //        model.addAttribute("products", products);
 
-        Page<Product> page = this.productService.getAllActionProductPagination(pageNo, pageSize, category);
+        Page<Product> page = null;
+        if (StringUtils.isEmpty(ch)) {
+            page = this.productService.getAllActionProductPagination(pageNo, pageSize, category);
+        } else {
+            page = this.productService.searchActiveProductPagination(pageNo, pageSize, category, ch);
+        }
+
+//        page = this.productService.getAllActionProductPagination(pageNo, pageSize, category);
         List<Product> products = page.getContent();
         model.addAttribute("products", products);
         model.addAttribute("pageNo", page.getNumber());

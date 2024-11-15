@@ -75,16 +75,10 @@ public class UserController {
         return "redirect:/product/" + productId;
     }
 
-    private UserDtls getLoggedInUserDetails(Principal principal) {
-        String email = principal.getName();
-        UserDtls userDtls = this.userService.getUserByEmail(email);
-        return userDtls;
-    }
-
     @GetMapping("/cart")
     public String loadCartPage(Principal principal, Model model) {
 
-        UserDtls userDtls = this.getLoggedInUserDetails(principal);
+        UserDtls userDtls = this.commonUtil.getLoggedInUserDetails(principal);
 
         List<Cart> carts = this.cartService.getCartByUser(userDtls.getId());
         model.addAttribute("carts", carts);
@@ -106,7 +100,8 @@ public class UserController {
     @GetMapping("/orders")
     public String orderPage(Principal principal, Model model) {
 
-        UserDtls userDtls = this.getLoggedInUserDetails(principal);
+        UserDtls userDtls = this.commonUtil.getLoggedInUserDetails(principal);
+
 
         List<Cart> carts = this.cartService.getCartByUser(userDtls.getId());
         model.addAttribute("carts", carts);
@@ -123,7 +118,8 @@ public class UserController {
     public String saveOrder(@ModelAttribute OrderRequest orderRequest,
                             Principal principal) throws MessagingException, UnsupportedEncodingException {
 //        System.out.println(orderRequest.toString());
-        UserDtls user = this.getLoggedInUserDetails(principal);
+        UserDtls user = this.commonUtil.getLoggedInUserDetails(principal);
+
         this.orderService.saveOrder(user.getId(), orderRequest);
 
         return "user/success";
@@ -131,7 +127,8 @@ public class UserController {
 
     @GetMapping("/my-orders")
     public String myOrder(Model model, Principal principal) {
-        UserDtls user = this.getLoggedInUserDetails(principal);
+        UserDtls user = this.commonUtil.getLoggedInUserDetails(principal);
+
         List<ProductOrder> orders = this.orderService.getOrdersByUser(user.getId());
         model.addAttribute("orders", orders);
         return "user/my_orders";
@@ -189,7 +186,7 @@ public class UserController {
                                  @RequestParam String currentPassword,
                                  Principal principal,
                                  HttpSession session) {
-        UserDtls loggInUserDetail = this.getLoggedInUserDetails(principal);
+        UserDtls loggInUserDetail = this.commonUtil.getLoggedInUserDetails(principal);
 
         Boolean matches = this.passwordEncoder.matches(currentPassword, loggInUserDetail.getPassword());
 

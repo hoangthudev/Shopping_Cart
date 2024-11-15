@@ -3,6 +3,7 @@ package com.ecom.shopping_cart.service.impl;
 import com.ecom.shopping_cart.module.Product;
 import com.ecom.shopping_cart.repository.ProductRepository;
 import com.ecom.shopping_cart.service.ProductService;
+import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
@@ -134,12 +135,25 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<Product> searchProductPagination(String ch, Integer pageNo, Integer pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-        return this.productRepository.findByisActiveTrueAndTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(ch, ch, pageable);
+        return this.productRepository.findByIsActiveTrueAndTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(ch, ch, pageable);
     }
 
     @Override
     public Page<Product> getAllProductsPagination(Integer pageNo, Integer pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
         return this.productRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<Product> searchActiveProductPagination(Integer pageNo, Integer pageSize, String category, String ch) {
+        Page<Product> pageProduct = null;
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        pageProduct = this.productRepository.findByIsActiveTrueAndTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(ch, ch, pageable);
+//        if (StringUtils.isEmpty(ch)) {
+//            pageProduct = this.productRepository.findByIsActiveTrue(pageable);
+//        } else {
+//            pageProduct = this.productRepository.findByCategory(pageable, category);
+//        }
+        return pageProduct;
     }
 }
