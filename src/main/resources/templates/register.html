@@ -30,7 +30,8 @@
                         </th:block>
                     </div>
                     <div class="card-body">
-                        <form th:action="@{/save-user}" enctype="multipart/form-data" method="post">
+                        <form th:action="@{/save-user}" enctype="multipart/form-data" method="post" id="userRegister"
+                              novalidate>
                             <div class="row">
                                 <div class="col">
                                     <div class="mb-3">
