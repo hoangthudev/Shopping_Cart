@@ -173,4 +173,9 @@ public class UserServiceImpl implements UserService {
         UserDtls saveUser = this.userRepository.save(user);
         return saveUser;
     }
+
+    @Override
+    public Boolean exitsEmail(String email) {
+        return this.userRepository.existsByEmail(email);
+    }
 }

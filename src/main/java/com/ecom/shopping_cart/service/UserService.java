@@ -36,4 +36,6 @@ public interface UserService {
     public UserDtls updateUserProfile(UserDtls user, MultipartFile imageProfile);
 
     public UserDtls saveAdmin(UserDtls user);
+
+    public Boolean exitsEmail(String email);
 }

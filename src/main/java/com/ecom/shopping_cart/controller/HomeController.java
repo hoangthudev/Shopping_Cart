@@ -100,24 +100,30 @@ public class HomeController {
     public String saveUser(@ModelAttribute UserDtls user, @RequestParam("img") MultipartFile file,
                            HttpSession session) throws IOException {
 
-        String imageName = file.isEmpty() ? "default.jpg" : file.getOriginalFilename();
-        user.setProfileImage(imageName);
-        UserDtls saveUser = this.userService.saveUser(user);
+        Boolean existsEmail = this.userService.exitsEmail(user.getEmail());
+        if (existsEmail) {
+            session.setAttribute("errorMsg", "Email existed");
+        } else {
 
-        if (!ObjectUtils.isEmpty(saveUser)) {
-            if (!file.isEmpty()) {
-                File saveFile = new ClassPathResource("static/img").getFile();
+            String imageName = file.isEmpty() ? "default.jpg" : file.getOriginalFilename();
+            user.setProfileImage(imageName);
+            UserDtls saveUser = this.userService.saveUser(user);
 
-                Path path = Paths.get(saveFile.getAbsolutePath()
-                        + File.separator + "profile_img"
-                        + File.separator + file.getOriginalFilename());
+            if (!ObjectUtils.isEmpty(saveUser)) {
+                if (!file.isEmpty()) {
+                    File saveFile = new ClassPathResource("static/img").getFile();
+
+                    Path path = Paths.get(saveFile.getAbsolutePath()
+                            + File.separator + "profile_img"
+                            + File.separator + file.getOriginalFilename());
 
 //            System.out.println(path);
-                Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+                    Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
 
-                session.setAttribute("successMsg", "Register successfully");
-            } else {
-                session.setAttribute("errorMsg", "Register failed");
+                    session.setAttribute("successMsg", "Register successfully");
+                } else {
+                    session.setAttribute("errorMsg", "Register failed");
+                }
             }
         }
         return "redirect:/register";
