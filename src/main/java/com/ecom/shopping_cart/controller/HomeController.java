@@ -56,7 +56,20 @@ public class HomeController {
     private CartService cartService;
 
     @GetMapping("/")
-    public String index() {
+    public String index(Model model) {
+        List<Category> allActiveCategory = this.categoryService.getAllActiveCategories()
+                .stream()
+                .sorted((ca1, ca2) -> ca2.getId())
+                .limit(6)
+                .toList();
+
+        List<Product> allActiveProduct = this.productService.getAllActiveProducts("")
+                .stream()
+                .sorted((p1, p2) -> p2.getId().compareTo(p1.getId()))
+                .limit(6)
+                .toList();
+        model.addAttribute("category", allActiveCategory);
+        model.addAttribute("products", allActiveProduct);
         return "index";
     }
 
